@@ -7,7 +7,9 @@ trigger:
 - main
 
 pool:
-  vmImage: ubuntu-latest
+  agent: default
+  demands:
+    - agent.name -equals self-hosted
 
 steps:
 - task: Maven@3
