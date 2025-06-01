@@ -16,7 +16,7 @@ steps:
   # Step 3: Publish Test Results (JUnit)
   - task: PublishTestResults@2
     inputs:
-      testResultsFiles: '*/target/surefire-reports/TEST-.xml'
+      testResultsFiles: '**/target/surefire-reports/TEST-*.xml'
       testResultsFormat: 'JUnit'
       failTaskOnMissingResultsFile: true
     displayName: 'Publish Maven Test Results'
