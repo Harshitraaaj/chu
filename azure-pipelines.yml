@@ -1,26 +1,30 @@
-# Maven
-# Build your Java project and run tests with Apache Maven.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/java
-
 trigger:
-- main
+  - main
 
 pool:
-  name: Default
-  demands:
-    - agent.name -equals azure-agent
-    - maven
-    - Agent.Version -gtVersion 2.163.1
+  name: 'self-hosted' # Your self-hosted agent pool name
 
 steps:
-- task: Maven@3
-  inputs:
-    mavenPomFile: 'pom.xml'
-    mavenOptions: '-Xmx3072m'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.11'
-    jdkArchitectureOption: 'x64'
-    publishJUnitResults: true
-    testResultsFiles: '**/surefire-reports/TEST-*.xml'
-    goals: 'package'
+  # Step 1: Checkout the Code from GitHub
+  - checkout: self
+    displayName: 'Checkout Code from GitHub'
+
+  # Step 2: Build and Run Unit Tests
+  - script: mvn clean test
+    displayName: 'Build and Run Unit Tests'
+
+  # Step 3: Publish Test Results (JUnit)
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFiles: '*/target/surefire-reports/TEST-.xml'
+      testResultsFormat: 'JUnit'
+      failTaskOnMissingResultsFile: true
+    displayName: 'Publish Maven Test Results'
+
+  # Step 4: Publish Build Artifacts
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: 'target'
+      ArtifactName: 'drop'
+      publishLocation: 'Container'
+    displayName: 'Publish Build Artifacts'
